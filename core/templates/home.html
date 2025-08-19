@@ -1,0 +1,403 @@
+
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+
+
+
+
+
+
+
+
+<div class="logo-titulo">
+    <img src="{% static 'img/logo1.png' %}" alt="Logo Centro Óptico" class="logo img-fluid">
+    <h1>
+        <span class="centro-optico">CENTRO ÓPTICO</span> 
+        <span class="by">by</span> 
+        <span class="lorena-lopez">LORENA LÓPEZ</span>
+    </h1>
+</div>
+
+
+
+
+
+<div class="container">
+    <div class="row g-4 justify-content-center">
+
+        <!-- Redes sociales -->
+        <!-- <div class="col-6 col-md-3">
+            <div class="card-custom h-100">
+                <i class="fab fa-facebook icon-large" style="color: #1877F2;"></i>
+                <h5>Facebook</h5>
+                <a class="contact-link" href="https://facebook.com/opticarelaxvision" style="color: #FFD700;">Visítanos</a>
+            </div>
+        </div> -->
+
+        <div class="col-6 col-md-3">
+            <div class="card-custom h-100">
+                <i class="fab fa-instagram icon-large" style="color: #E4405F;"></i>
+                <h5>Instagram</h5>
+                <h5>Lorena Lopez</h5>
+                <a class="contact-link" href="https://www.instagram.com/lorelop125?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" style="color: #FFD700;">Seguinos</a>
+            </div>
+        </div>
+
+
+        <div class="col-6 col-md-3">
+            <div class="card-custom h-100">
+                <i class="fab fa-instagram icon-large" style="color: #E4405F;"></i>
+                <h5>Instagram</h5>
+                <h5>(VRB)</h5>
+                <a class="contact-link" href="https://www.instagram.com/centroptico_lorenalopez?utm_source=qr&igsh=OWQwbGN0MWYzYW52" style="color: #FFD700;">Seguinos</a>
+            </div>
+        </div>
+
+
+<!-- Ubicación Saenz Peña -->
+<div class="col-6 col-md-3">
+    <div class="card-custom h-100">
+        <i class="fas fa-map-marker-alt icon-large" style="color: #e0f004"></i>
+        <h5>Ubicación Saenz Peña</h5>
+        <a href="#" class="contact-link" style="color: #FFD700;" 
+           onclick="mostrarMapa(event, 'saenz')">Ver mapa</a>
+    </div>
+</div>
+
+<!-- Ubicación Villa Río Bermejito -->
+<div class="col-6 col-md-3">
+    <div class="card-custom h-100">
+        <i class="fas fa-map-marker-alt icon-large" style="color: #e804f0"></i>
+        <h5>Ubicación Villa Río Bermejito</h5>
+        <a href="#" class="contact-link" style="color: #FFD700;" 
+           onclick="mostrarMapa(event, 'bermejito')">Ver mapa</a>
+    </div>
+</div>
+
+<!-- Modal flotante -->
+<div id="mapaModal" class="mapa-modal">
+    <div class="mapa-content">
+        <span class="cerrar" onclick="cerrarMapa()">&times;</span>
+        <iframe id="mapaIframe" width="100%" height="450" style="border:0;" 
+            allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+</div>
+
+
+
+
+
+        <!-- Publicidad fija -->
+        <!-- <div class="col-12 col-md-6">
+            <div class="promo-box h-100">
+                <h4><i class="fas fa-bullhorn"></i> Promo Agosto..publicacion fija</h4>
+                <p>🎉 30% OFF en cristales antirreflejo</p>
+                <p>📅 Hasta el 10 de agosto</p>
+                <p>👓 ¡Vení con tu receta y te asesoramos!</p>
+            </div>
+        </div> -->
+
+        <!-- Publicidad dinámica (texto) -->
+        <div class="col-12 col-md-6"   >
+            <div class="promo-box h-100">
+                {% if publicacion %}
+                    <h4 style="color: #FFD700; font-weight: bold;"  ><i class="fas fa-bullhorn" ></i>  {{ publicacion.titulo }}</h4>
+                    <p style="color: #FFD700;">{{ publicacion.contenido }}</p>
+                    {% if user.is_superuser %}
+                        <a href="{% url 'editar_publicacion' %}" class="btn btn-warning btn-sm mt-2">Editar</a>
+                    {% endif %}
+                {% else %}
+                    <p>No hay publicación disponible.</p>
+                {% endif %}
+
+
+
+
+
+<!-- esto es la imagen dinamica -->
+
+<div class="container mt-4">
+    <div class="card shadow border-0" style="border: 2px solid #ccc; border-radius: 10px; overflow: hidden;">
+        <div class="card-body p-0">
+            {% if publicacion.imagen %}
+                <img src="{{ publicacion.imagen.url }}" 
+                    alt="Imagen de la publicación" 
+                    style="max-width: 100%; max-height: 100%; object-fit: contain; display: block;">
+            {% endif %}
+        </div>
+        {% if user.is_authenticated and user.is_superuser %}
+        <div class="card-footer text-muted text-center">
+            Última actualización: {{ publicacion.fecha_actualizacion|date:"d/m/Y H:i" }}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+
+
+
+
+
+    </div>
+</div>
+
+<!-- COMENTARIOS -->
+<div class="container mt-5">
+    <h3 style="color: #FFD700;"><i class="fas fa-comments"></i> Comentarios</h3>
+
+    <!-- Listado de comentarios aprobados -->
+    <div class="mb-4">
+        {% if comentarios %}
+            {% for comentario in comentarios %}
+                <div class="border rounded p-3 mb-2" style="background: rgba(255,255,255,0.1);">
+                    <strong style="color: #FFD700;">{{ comentario.nombre }}</strong> 
+                    <span class="text-muted" style="font-size: 0.9em;">
+                        ({{ comentario.fecha_creacion|date:"d/m/Y H:i" }})
+                    </span>
+                    <p style="color:white;">{{ comentario.contenido }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p style="color:white;">Aún no hay comentarios.</p>
+        {% endif %}
+    </div>
+
+    <!-- Formulario para enviar comentario -->
+
+</div>
+
+
+<!-- Formulario para enviar comentario -->
+<div class="card p-3" style="max-width: 400px; margin: auto;">
+    <h6 class="mb-2">Dejá tu comentario</h6>
+    <form method="post" class="mb-0">
+        {% csrf_token %}
+        <div class="mb-2">
+            {{ comentario_form.nombre.label_tag }}
+            {{ comentario_form.nombre|add_class:"form-control form-control-sm" }}
+        </div>
+        <div class="mb-2">
+            {{ comentario_form.contenido.label_tag }}
+            {{ comentario_form.contenido|add_class:"form-control form-control-sm" }}
+        </div>
+        <button type="submit" class="btn btn-sm btn-warning">Enviar</button>
+    </form>
+    <small class="text-muted" style="font-size: 0.8em;">
+        * Tu comentario será visible una vez aprobado por el administrador.
+    </small>
+</div>
+
+
+
+{% if contador %}
+    <div class="alert alert-info mt-3">
+        <strong>Visitas totales:</strong> {{ contador.cantidad }}
+    </div>
+{% endif %}
+
+
+
+<!-- Botón flotante WhatsApp -->
+<!-- Botón flotante WhatsApp -->
+<!-- Botón flotante WhatsApp -->
+<div class="whatsapp-container">
+    <a href="https://wa.me/5493644355833" class="floating-btn" title="¡Chateá con nosotros!">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+    <p class="whatsapp-text">Comunicate conmigo</p>
+</div>
+
+<style>
+.whatsapp-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;  /* mantiene botón y texto alineados al centro entre sí */
+    text-align: center;
+    z-index: 1000;
+}
+
+.floating-btn {
+    background: #25D366;
+    color: white;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    font-size: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    text-decoration: none;
+}
+
+.whatsapp-text {
+    margin-top: 6px;
+    font-size: 14px;
+    color: #25D366;
+    font-weight: bold;
+}
+
+
+
+
+    .card-custom {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        transition: transform 0.3s;
+        backdrop-filter: blur(10px);
+        height: 100%;
+    }
+    .card-custom:hover {
+        transform: scale(1.05);
+    }
+    .logo {
+        max-width: 150px;
+    }
+    .title {
+        font-size: 2rem;
+        font-weight: bold;
+    }
+    .promo-box {
+        background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(0,0,0,0.6));
+
+        color: #2C5364;
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+.promo-box img {
+    max-width: 100%;
+    max-height: 350px; /* Ajusta el alto máximo que quieras */
+    object-fit: contain; /* Mantiene proporciones sin recortar */
+    border-radius: 10px;
+    width: 100%;  /* Ocupa todo el ancho del contorno azul */
+    height: auto; /* Mantiene la proporción */
+    
+}
+
+
+
+
+/* tirulo centro optico */
+/* Importar las fuentes similares desde Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Dancing+Script:wght@400;700&display=swap');
+
+.logo-titulo {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.logo-titulo h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: baseline;
+    gap: 8px;
+}
+
+/* Parte "CENTRO ÓPTICO" */
+.centro-optico {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.8rem;
+    font-weight: bold;
+}
+
+/* Parte "by" en estilo manuscrito */
+.by {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin: 0 4px;
+}
+
+/* Parte "LORENA LÓPEZ" */
+.lorena-lopez {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem;
+    font-weight: bold;
+}
+
+
+
+
+/* Fondo del modal */
+.mapa-modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1050; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(0,0,0,0.7);
+    justify-content: center;
+    align-items: center;
+}
+
+/* Caja del mapa */
+.mapa-content {
+    background: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    max-width: 90%;
+    width: 650px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    position: relative;
+}
+
+/* Botón cerrar */
+.cerrar {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+}
+
+
+
+
+
+
+
+
+
+
+</style>
+<script>
+function mostrarMapa(e, lugar) {
+    e.preventDefault();
+
+    let iframe = document.getElementById("mapaIframe");
+
+    if (lugar === "saenz") {
+        iframe.src = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d890.4384256707289!2d-60.4402192304706!3d-26.784119901326275!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94412d1c516e17a3%3A0xc06f8b541a71465a!2sCENTRO%20OPTICO%20BY%20LORENA%20LOPEZ!5e0!3m2!1ses-419!2sar!4v1755278450769!5m2!1ses-419!2sar";
+    } else if (lugar === "bermejito") {
+        iframe.src = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d890.4437791379863!2d-60.43981421690936!3d-26.783437484781153!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94412d1d0130f7bb%3A0x847095bcafe2902f!2sCuartel%20de%20Bomberos!5e0!3m2!1ses-419!2sar!4v1755305734375!5m2!1ses-419!2sar";
+    }
+
+    document.getElementById("mapaModal").style.display = "flex";
+}
+
+function cerrarMapa() {
+    document.getElementById("mapaModal").style.display = "none";
+    document.getElementById("mapaIframe").src = ""; // limpia para no dejar cargado
+}
+</script>
+{% endblock %}
+

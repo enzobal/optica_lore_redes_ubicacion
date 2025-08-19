@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Deja tu comentario</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-primary">Enviar</button>
+    </form>
+
+    <hr>
+    <h3>Comentarios de usuarios</h3>
+    {% for comentario in comentarios %}
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5>{{ comentario.nombre }}</h5>
+                <p>{{ comentario.texto }}</p>
+                <small>{{ comentario.fecha|date:"d/m/Y H:i" }}</small>
+
+                {% if user.is_staff %}
+                    <div class="mt-2">
+                        {% if not comentario.aprobado %}
+                            <a href="{% url 'aprobar_comentario' comentario.id %}" class="btn btn-success btn-sm">Aprobar</a>
+                        {% endif %}
+                        <a href="{% url 'eliminar_comentario' comentario.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <p>No hay comentarios aún.</p>
+    {% endfor %}
+</div>
+{% endblock %}
